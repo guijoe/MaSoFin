@@ -20,6 +20,8 @@ public class Simulator : DataInterface{
     {
         this.folder = folder;
         this.file = file;
+
+        logFile = folder + "/" + file;
     }
 
 	public override void ProcessMovitData()
@@ -77,37 +79,23 @@ public class Simulator : DataInterface{
         }
         centre[frm] /= frmActiveCount;
 
-        //Debug.Log(centre[frm]);
         for(int n=0; n<dataFrame[frm].Length; n++){
             FindNeighbours(frm);
             ComputeOrientation(frm, true);
             if(dataFrame[frm][n].active == 1){
                 dataFrame[frm][n].rotatedPosition = finMatrix.R.Transpose() * (dataFrame[frm][n].position - centre[frm]) + centre[frm];
-                //Debug.Log(frm + ", " + n + ", " + dataFrame[frm][n].principalAxis);
                 dataFrame[frm][n].principalAxis =  finMatrix.R.Transpose() * dataFrame[frm][n].principalAxis;
-                //Debug.Log(frm + ", " + n + ", " + dataFrame[frm][n].principalAxis);
             }
         }
         ComputeOrientationDistribution(frm, true);
         Debug.Log(meanStr);
 
         //*/
-		//CreateCellPopulation();
-        ComputeOrientationDispersion();
+		ComputeOrientationDispersion();
         ComputeBoundingBox();
-
-        for(int fr=NrFrames-2; fr>=0; fr--){
-            for(int i=0; i<dataFrame[fr].Length; i++){
-                if(dataFrame[fr][i].active == 1){
-                    //dataFrame[fr][i].angle = dataFrame[NrFrames-2][i].angle;
-                    //dataFrame[fr][i].sin = dataFrame[NrFrames-2][i].sin;
-                }
-            }
-        }
-
     }
 
-    public void Duplicate()
+    public override void Duplicate()
     {
         //NrFrames = 5;
         dataFrame = new CellData[NrFrames][];
@@ -481,24 +469,8 @@ public class Simulator : DataInterface{
 		}
 	}
 
-    private int[] shuffle(int[] intArray)
-    {
-    int[] shuffledArray = new int[intArray.Length];
-    int rndNo;
- 
-    System.Random rnd = new System.Random();
-    for (int i = intArray.Length; i >= 1; i--)
-    {
-        rndNo = rnd.Next(1, i+1) - 1;
-        shuffledArray[i - 1] = intArray[rndNo];
-        intArray[rndNo] = intArray[i - 1];
-    }
-    return shuffledArray;
-    }
-
-
     float meanNeighbourDistance = 0;
-    public void FindNeighbours(int fr)
+    public override void FindNeighbours(int fr)
     {
         // Compute Double Mean Distance Square
         float doubleMeanDistanceSquare = 0;
@@ -648,5 +620,4 @@ public class Simulator : DataInterface{
         }
         //*/
     }
-	
 }

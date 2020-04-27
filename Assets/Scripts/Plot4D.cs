@@ -60,9 +60,9 @@ public class Plot4D : MonoBehaviour {
         }
 
         axisLabels = new string[3]{"x(μm)", "y(μm)", "z(μm)" };
-        NrClasses = new int[3]{3, 3, 3};
         significantPlaces = new string[3]{"0", "0", "0"};
-
+        NrClasses = new int[3]{3, 3, 3};
+        
         complementarySeries = new int[nbOfSeries-1][];
     }
 
@@ -96,7 +96,11 @@ public class Plot4D : MonoBehaviour {
             //Debug.Log("hello");
         }
 
-        metrics = GetComponentInParent<ViewerController>().tuples;
+        //metrics = GetComponentInParent<ViewerController>().tuples;
+
+        ViewerController viewer = GetComponentInParent(typeof(ViewerController)) as ViewerController;
+        Debug.Log(viewer.tuples);
+        metrics = viewer.tuples;
         NrFrames = metrics.Length;
 
         PreparePlot();
@@ -117,12 +121,13 @@ public class Plot4D : MonoBehaviour {
         int nbChars = timeStr.Length;
         timeLabel.GetComponent<TextMesh>().text = timeStr + "hpf";
 
+        timeLabel.transform.localPosition = new Vector3(10.2f, 
+                                                        timeLabel.transform.localPosition.y,
+                                                        timeLabel.transform.localPosition.z);
         if(nbChars > 3 && frame == 0){
             Vector3 pos = timeLabel.transform.localPosition;
             timeLabel.transform.localPosition += new Vector3(-.1f-(nbChars-3), 0,0);
         }
-
-        //Debug.Log("Hello Start Plot4D");
     }
 
     // Update is called once per frame

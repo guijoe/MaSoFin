@@ -1,4 +1,11 @@
-﻿using System;
+﻿/********************************** Credits *******************************/
+// Code for matrix diagonalisation was adapted from Maarten Kronenburg paper
+// "A Method for Fast Diagonalization of a 2x2 or 3x3 Real Symmetric Matrix"
+// Original paper and C++ source code can be found
+// https://arxiv.org/abs/1306.6291
+/**************************************************************************/
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -777,125 +784,6 @@ public class Matrix3x3
         return new Vector3[]{maxAxis, secondAxis, thirdAxis, pA1, pA2, pA3};
     }
 
-
-    public Vector3[] ComputePrincipalAxis5(Vector3[] pAs)
-    {
-        sym_eigen();
-        compute_matrix();
-
-        // Compute 1st, 2nd, 3rd axis consistant with past basis
-        int maxDotIndex=0;
-        List<int> indices = new List<int>(){0,1,2};
-        Vector3 newPA1 = MostColinear(indices, pAs[3], out maxDotIndex);
-        indices.Remove(maxDotIndex);
-        Vector3 newPA2 = MostColinear(indices, pAs[4], out maxDotIndex);
-        indices.Remove(maxDotIndex);
-        Vector3 newPA3 = MostColinear(indices, pAs[5], out maxDotIndex);
-
-        // Reorient 1st, 2nd, 3rd axis consistant with past basis
-        //*
-        if(Vector3.Dot(newPA1, pAs[3]) < 0)
-            newPA1 = -newPA1;
-        if(Vector3.Dot(newPA2, pAs[4]) < 0)
-            newPA2 = -newPA2;
-        if(Vector3.Dot(newPA3, pAs[5]) < 0)
-            newPA3 = -newPA3;
-        //*/
-        
-        pA1 = newPA1;
-        pA2 = newPA2;
-        pA3 = newPA3;
-        R = new Matrix3x3(pA1, pA2, pA3);
-
-        //*
-        Vector3 e1 = new Vector3(R[0, 0], R[1, 0], R[2, 0]);
-        Vector3 e2 = new Vector3(R[0, 1], R[1, 1], R[2, 1]);
-        Vector3 e3 = new Vector3(R[0, 2], R[1, 2], R[2, 2]);
-
-        Vector3 pA = pAs[0];
-        float maxDot = Mathf.Abs(Vector3.Dot(e1, pA));
-        float minDot = maxDot;
-        maxDotIndex = 0;
-        int minDotIndex = 0;
-
-        float dot = Mathf.Abs(Vector3.Dot(e2, pA));
-        if (dot > maxDot)
-        {
-            maxDot = dot;
-            maxDotIndex = 1;
-        }
-        //*
-        else if (dot < minDot)
-        {
-            minDot = dot;
-            minDotIndex = 1;
-        }
-        //*/
-
-        dot = Mathf.Abs(Vector3.Dot(e3, pA));
-        if (dot > maxDot)
-        {
-            maxDot = dot;
-            maxDotIndex = 2;
-        }
-        //*
-        else if (dot < minDot)
-        {
-            minDot = dot;
-            minDotIndex = 2;
-        }
-        //*/
-
-        Vector3 maxAxis = new Vector3(R[0, maxDotIndex],
-                            R[1, maxDotIndex],
-                            R[2, maxDotIndex]);
-
-        //*
-        Vector3 minAxis = new Vector3(R[0, minDotIndex],
-                            R[1, minDotIndex],
-                            R[2, minDotIndex]);
-
-        int intermediateDotIndex = 3 - maxDotIndex - minDotIndex;
-        Vector3 intermediateAxis = new Vector3(R[0, intermediateDotIndex],
-                                               R[1, intermediateDotIndex],
-                                               R[2, intermediateDotIndex]);
-        //*/
-
-        //Keep 2nd and 3rd axis consistent with previous: 
-        //Project old 2nd and 3rd axis onto current 2nd and 3rd axis plane
-        //https://www.euclideanspace.com/maths/geometry/elements/plane/lineOnPlane/index.htm
-        Vector3 B = maxAxis;
-        Vector3 A1 = pAs[1];
-        Vector3 A2 = pAs[2];
-
-        Vector3 u1 = Vector3.Cross(B, Vector3.Cross(A1, B));
-        u1.Normalize();
-        Vector3 u2 = Vector3.Cross(B, u1);
-
-        // Check u2 orientation
-        Vector3 u2prime = Vector3.Cross(B, Vector3.Cross(A2, B));
-        if(Vector3.Dot(u2, u2prime) < 0){
-            u2 = -u2;
-        }
-
-        R = new Matrix3x3(maxAxis, u1, u2, maxDotIndex, intermediateDotIndex, minDotIndex);
-
-        // Compute 1st, 2nd, 3rd axis consistant with past basis
-        maxDotIndex=0;
-        indices = new List<int>(){0,1,2};
-        pA1 = MostColinear(indices, pAs[3], out maxDotIndex);
-        indices.Remove(maxDotIndex);
-        pA2 = MostColinear(indices, pAs[4], out maxDotIndex);
-        indices.Remove(maxDotIndex);
-        pA3 = MostColinear(indices, pAs[5], out maxDotIndex);
-
-        //Debug.Log(pA1.ToString("F4") + "; " + pA2.ToString("F4") + "; " + pA3.ToString("F4"));
-        //Debug.Log(Vector3.Cross(pA2,pA3).ToString("F4") + "; " + Vector3.Cross(pA3,pA1).ToString("F4") + "; " + Vector3.Cross(pA1, pA2).ToString("F4"));
-        
-        //return new Vector3[]{maxAxis, intermediateAxis, minAxis, pA1, pA2, pA3};
-        return new Vector3[]{maxAxis, u1, u2, pA1, pA2, pA3};
-    }
-
     public Vector3 ComputePrincipalAxis(Vector3 pA)
     {
         sym_eigen();
@@ -929,10 +817,6 @@ public class Matrix3x3
         return principalAxis;
     }
 
-    public Vector3 ReorientNewBasis(Vector3 e1, Vector3 e2, Vector3 e3){
-        return new Vector3();
-    }
-
     public Vector3 MostColinear(List<int> indices, Vector3 pA, out int maxDotIndex){
         //Debug.Log("Count: " + indices.Count);
         maxDotIndex = indices[0];
@@ -963,149 +847,4 @@ public class Matrix3x3
                             R[1, maxDotIndex],
                             R[2, maxDotIndex]);
     }
-
-    public Vector3[] ComputePrincipalAxis4(Vector3[] pAs)
-    {
-        sym_eigen();
-        compute_matrix();
-
-        Vector3 e1 = new Vector3(R[0, 0], R[1, 0], R[2, 0]);
-        Vector3 e2 = new Vector3(R[0, 1], R[1, 1], R[2, 1]);
-        Vector3 e3 = new Vector3(R[0, 2], R[1, 2], R[2, 2]);
-
-        Vector3 pA = pAs[0];
-
-        float maxDot = Mathf.Abs(Vector3.Dot(e1, pA));
-        float minDot = maxDot;
-        int maxDotIndex = 0;
-        int minDotIndex = 0;
-
-        float dot = Mathf.Abs(Vector3.Dot(e2, pA));
-        if (dot > maxDot)
-        {
-            maxDot = dot;
-            maxDotIndex = 1;
-        }
-        else if (dot < minDot)
-        {
-            minDot = dot;
-            minDotIndex = 1;
-        }
-
-        dot = Mathf.Abs(Vector3.Dot(e3, pA));
-        if (dot > maxDot)
-        {
-            maxDot = dot;
-            maxDotIndex = 2;
-        }
-        else if (dot < minDot)
-        {
-            minDot = dot;
-            minDotIndex = 2;
-        }
-
-        Vector3 maxAxis = new Vector3(R[0, maxDotIndex],
-                            R[1, maxDotIndex],
-                            R[2, maxDotIndex]);
-
-        Vector3 minAxis = new Vector3(R[0, minDotIndex],
-                            R[1, minDotIndex],
-                            R[2, minDotIndex]);
-
-        int intermediateDotIndex = 3 - maxDotIndex - minDotIndex;
-        Vector3 intermediateAxis = new Vector3(R[0, intermediateDotIndex],
-                                               R[1, intermediateDotIndex],
-                                               R[2, intermediateDotIndex]);
-
-        
-
-        // Choose 1st, 2nd and 3rd axis, which is what is relevant for the rotation
-        Vector3 firstAxis = new Vector3();
-        Vector3 secondAxis = new Vector3();
-        Vector3 thirdAxis = new Vector3();
-        int secondAxisIndex, thirdAxisIndex;
-        if (Mathf.Abs(Vector3.Dot(intermediateAxis, pA1)) >= Mathf.Abs(Vector3.Dot(minAxis, pA1)))
-        {
-            secondAxis = intermediateAxis;
-            thirdAxis = minAxis;
-            secondAxisIndex = intermediateDotIndex;
-            thirdAxisIndex = minDotIndex;
-        }
-        else
-        {
-            secondAxis = minAxis;
-            thirdAxis = intermediateAxis;
-            secondAxisIndex = minDotIndex;
-            thirdAxisIndex = intermediateDotIndex;
-        }
-
-        //Reorient Basis
-        if (Vector3.Dot(pA, maxAxis) < 0)
-        {
-            maxAxis = -maxAxis;
-            intermediateAxis = -intermediateAxis;
-            minAxis = minAxis;
-            //R = new Matrix3x3(maxAxis, intermediateAxis, minAxis);
-            R = new Matrix3x3(maxAxis, intermediateAxis, minAxis, maxDotIndex, intermediateDotIndex, minDotIndex);
-        }
-
-        return new Vector3[] { maxAxis, secondAxis , thirdAxis};
-    }
-
-    public Vector3[] ComputePrincipalAxis(Vector3 pA1, Vector3 pA2)
-    {
-        sym_eigen();
-        compute_matrix();
-
-        Vector3 e1 = new Vector3(R[0, 0], R[1, 0], R[2, 0]);
-        Vector3 e2 = new Vector3(R[0, 1], R[1, 1], R[2, 1]);
-        Vector3 e3 = new Vector3(R[0, 2], R[1, 2], R[2, 2]);
-
-        Vector3 pA = Vector3.Cross(pA1, pA2);
-
-        float maxDot = Mathf.Abs(Vector3.Dot(e1, pA));
-        float minDot = maxDot;
-        int maxDotIndex = 0;
-        int minDotIndex = 0;
-
-        float dot = Mathf.Abs(Vector3.Dot(e2, pA));
-        if (dot > maxDot)
-        {
-            maxDot = dot;
-            maxDotIndex = 1;
-        }
-        else if(dot < minDot)
-        {
-            minDot = dot;
-            minDotIndex = 1;
-        }
-
-        dot = Mathf.Abs(Vector3.Dot(e3, pA));
-        if (dot > maxDot)
-        {
-            maxDot = dot;
-            maxDotIndex = 2;
-        }
-        else if (dot < minDot)
-        {
-            minDot = dot;
-            minDotIndex = 2;
-        }
-
-        Vector3 maxAxis = new Vector3(R[0, maxDotIndex],
-                            R[1, maxDotIndex],
-                            R[2, maxDotIndex]);
-
-        Vector3 minAxis = new Vector3(R[0, minDotIndex],
-                            R[1, minDotIndex],
-                            R[2, minDotIndex]);
-
-        int intermediateDotIndex = 3 - maxDotIndex - minDotIndex;
-        Vector3 intermediateAxis = new Vector3(R[0, intermediateDotIndex],
-                                               R[1, intermediateDotIndex],
-                                               R[2, intermediateDotIndex]);
-
-        return new Vector3[] { maxAxis, intermediateAxis, minAxis };
-    }
-
 };

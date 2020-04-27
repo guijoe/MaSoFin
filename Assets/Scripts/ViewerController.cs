@@ -4,13 +4,13 @@ using UnityEngine;
 
 public class ViewerController : MonoBehaviour {
 
-    int NrPlots = 13;//6;//
-    float[] AxisLengths;
+    protected int NrPlots = 13;//6;//
+    protected float[] AxisLengths;
     public float[][][] tuples;
 
-    DataInterface timeSeries;
+    protected DataInterface timeSeries;
 
-    Plot4D[] plots;
+    protected Plot4D[] plots;
     public Plot4D plot4DPrefab;
 
     //public int[][] metricIndices;
@@ -18,21 +18,22 @@ public class ViewerController : MonoBehaviour {
     public bool play = false;
     public bool reset = false;
 
-    public bool enhancePlot = false;
+    public bool enhancePlot = true;
 
     public int frame = 0;
 
-    int[] dim;
+    protected int[] dim;
     public static Vector3[] NSquaredInN;
 
     public string folder = "C:/Users/18003111/OneDrive - MMU/Documents/movit/application.windows64/MovitData/distant/180420hZ";
 
+    public virtual void InitPlots(){}
+
+    public virtual void GetData(){}
+
     // Use this for initialization
     void Awake () {
-        //timeSeries = new MovitTimeSeries(folder, "test_06012020.csv");//"test.csv");//
-        timeSeries = new Simulator(folder, "test_06012020.csv");
-        timeSeries.ProcessMovitData();
-        //timeSeries.Log();
+        GetData();
 
         dim = new int[2];
         dim[1] = (int)Mathf.Floor(Mathf.Sqrt(NrPlots));
@@ -56,7 +57,8 @@ public class ViewerController : MonoBehaviour {
         }
 
         resetValues = new int[15]{0,258, 515, 0, 258, 515, 0, 258, 515, 515, 515, 515, 515, 515, 515};
-        //resetValues = new int[15]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        tuples = timeSeries.DataFrameToTuples();
+        InitPlots();
 
         /*
         // ***** Development description ***** //
@@ -135,7 +137,7 @@ public class ViewerController : MonoBehaviour {
         plots[8].NrClasses = new int[3]{5, 5, 5};
         //*/
 
-        //*
+        /*
         // ***** Orientation angle distribution ***** //
         tuples = timeSeries.DataFrameToTuples();
         

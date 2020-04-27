@@ -70,6 +70,8 @@ public abstract class DataInterface {
     {
         this.folder = folder;
         this.file = file;
+
+        logFile = folder + "/" + file;
     }
 
 	public abstract void ProcessMovitData();
@@ -102,11 +104,13 @@ public abstract class DataInterface {
         }
     }
 
+    protected string logFile;
     public void ReadResults()
     {
-        string logFile = folder + "/test_06012020.csv"; //"/test.csv";//
+        //string logFile = folder + "/test_06012020.csv"; //"/test.csv";//
         //string logFile = folder + "/190425aZ_t_all_T.csv";//"/test.csv";
 
+        Debug.Log(logFile);
         string[] results = File.ReadAllLines(logFile);
 
         vertices = new Vertex3[NrFrames][];
@@ -765,6 +769,236 @@ public abstract class DataInterface {
             }
         }
         //Debug.Log(maxIndex + ", " + max + ", " + (classes[maxIndex] + classes[maxIndex]) / 2);
+    }
+
+    public virtual void Duplicate()
+    {
+        //NrFrames = 5;
+        dataFrame = new CellData[NrFrames][];
+        axis = new Vector3[NrFrames][];
+        centre = new Vector3[NrFrames];
+        for (int fr = NrFrames - 1; fr >= 0; fr--)
+        {
+            dataFrame[fr] = new CellData[nbOfCellsPerFrame[NrFrames - 1]];
+            axis[fr] = new Vector3[3];
+        }
+
+        // Last frame
+        int i = 0;
+        foreach (KeyValuePair<int, CellData> item1 in dataPerCellPerFrame[NrFrames - 1])
+        {
+            dataFrame[NrFrames - 1][i] = dataPerCellPerFrame[NrFrames - 1][item1.Key];
+            dataFrame[NrFrames - 1][i].globalId = item1.Key;
+            dataFrame[NrFrames - 1][i].velocity = new Vector3();
+            dataFrame[NrFrames - 1][i].ID = i;
+            dataFrame[NrFrames - 1][i].active = 1;
+            dataFrame[NrFrames - 1][i].fr = NrFrames - 1;
+            dataFrame[NrFrames - 1][i].selection = item1.Value.selection;
+            dataPerCellPerFrame[NrFrames - 1][item1.Key].ID = i;
+
+            int j = 0;
+            foreach (KeyValuePair<int, CellData> item2 in dataPerCellPerFrame[NrFrames - 2])
+            {
+                if (item1.Value.mother == item2.Key)
+                {
+                    dataFrame[NrFrames - 1][i].uniqueMotherID = j;
+                }
+                j++;
+            }
+            i++;
+        }
+
+        for (int fr = NrFrames - 2; fr >= 0; fr--)
+        {
+            List<int> activeList = new List<int>();
+            for (int j = 0; j < dataFrame[fr + 1].Length; j++)
+            {
+                //405: 1152713952
+                //404: 1121106983
+                //Debug.Log(fr + ": " + dataFrame[fr + 1][j].mother);
+                CellData currentCD = new CellData();
+                //if (dataPerCellPerFrame[fr].ContainsKey(dataFrame[fr + 1][j].mother))
+                if(dataPerCellPerFrame[fr].TryGetValue(dataFrame[fr + 1][j].mother, out currentCD))
+                {
+                    dataFrame[fr][j] = new CellData(dataPerCellPerFrame[fr][dataFrame[fr + 1][j].mother]);
+                    dataFrame[fr][j].ID = j;
+                    dataFrame[fr][j].fr = fr;
+                    dataFrame[fr][j].uniqueMotherID = j;
+                    //dataFrame[fr][j].velocity = dataFrame[fr + 1][j].position - dataFrame[fr][j].position;
+                    //dataFrame[fr][j].globalId = dataPerCellPerFrame[fr][dataFrame[fr + 1][j].mother].globalId;
+                    dataFrame[fr][j].globalId = currentCD.globalId;
+                    //Debug.Log(dataPerCellPerFrame[fr][dataFrame[fr + 1][j].mother].globalId);
+                    dataFrame[fr][j].active = dataFrame[fr + 1][j].active;
+                    dataFrame[fr][j].selection = dataFrame[fr + 1][j].selection;
+                    //dataPerCellPerFrame[fr][dataFrame[fr][j].globalId].ID = j;
+
+                    if (dataFrame[fr][j].children[1] != -1)
+                    {
+                        activeList.Add(j);
+                    }
+                }
+                else
+                {
+                    dataFrame[fr][j] = new CellData(dataFrame[fr + 1][j]);
+                    dataFrame[fr][j].fr = fr;
+                    dataFrame[fr][j].uniqueMotherID = j;
+                    dataFrame[fr][j].velocity = Vector3.zero;
+                    dataFrame[fr][j].children[0] = dataFrame[fr][j].children[1] = -1;
+                }
+            }
+
+            for (int j = 0; j < activeList.Count; j++)
+            {
+                for (int k = j + 1; k < activeList.Count; k++)
+                {
+                    if (dataFrame[fr][activeList[j]].children[0] == dataFrame[fr][activeList[k]].children[0])
+                    {
+                        dataFrame[fr][activeList[k]].active = 0;
+                    }
+                }
+            }
+        }
+
+        //*
+        // Initialise neighbourhood
+        for (int fr = 0; fr < NrFrames; fr++)
+        {
+            for (int k = 0; k < nbOfCellsPerFrame[NrFrames - 1]; k++)
+            {
+                dataFrame[fr][k].neighbourhood = new int[nbOfCellsPerFrame[NrFrames - 1]];
+            }
+        }
+        //*/
+
+        //*
+        // Compute Velocities
+        int step = 1;
+        for (int fr = 0; fr < NrFrames - step; fr++)
+        {
+            for (int j = 0; j < nbOfCellsPerFrame[NrFrames - 1]; j++)
+            {
+                dataFrame[fr][j].velocity = dataFrame[fr + step][j].position - dataFrame[fr][j].position;
+            }
+        }
+        //*/
+    }
+
+    public virtual void FindNeighbours(int fr)
+    {
+        // Compute Double Mean Distance Square
+        float doubleMeanDistanceSquare = 0;
+        foreach (KeyValuePair<int, CellData> item1 in dataPerCellPerFrame[fr])
+        {
+            foreach (KeyValuePair<int, CellData> item2 in dataPerCellPerFrame[fr])
+            {
+                doubleMeanDistanceSquare += (item1.Value.position - item2.Value.position).magnitude;
+            }
+        }
+        doubleMeanDistanceSquare /= (nbOfCellsPerFrame[fr] * (nbOfCellsPerFrame[fr] - 1));
+        doubleMeanDistanceSquare *= 2;
+        doubleMeanDistanceSquare *= doubleMeanDistanceSquare;
+
+        //Debug.Log(fr + ": " + doubleMeanDistanceSquare);
+
+        //*
+        // Create Delaunay
+        delaunay = new DelaunayTriangulation3();
+        delaunay.Generate(vertices[fr], true, false, doubleMeanDistanceSquare);
+
+        for (int j = 0; j < nbOfCellsPerFrame[NrFrames - 1]; j++)
+        {
+            foreach (DelaunayCell<Vertex3> cell in delaunay.Cells)
+            {
+                Simplex<Vertex3> f = cell.Simplex;
+                Vector3 vec = new Vector3(f.Vertices[0].X, f.Vertices[0].Y, f.Vertices[0].Z);
+                if ((vec - dataFrame[fr][j].position).sqrMagnitude == 0 && dataFrame[fr][j].active == 1)
+                {
+                    cell.Simplex.Vertices[0].Id = dataFrame[fr][j].ID;
+                }
+
+                vec = new Vector3(f.Vertices[1].X, f.Vertices[1].Y, f.Vertices[1].Z);
+                if ((vec - dataFrame[fr][j].position).sqrMagnitude == 0 && dataFrame[fr][j].active == 1)
+                {
+                    cell.Simplex.Vertices[1].Id = dataFrame[fr][j].ID;
+                }
+
+                vec = new Vector3(f.Vertices[2].X, f.Vertices[2].Y, f.Vertices[2].Z);
+                if ((vec - dataFrame[fr][j].position).sqrMagnitude == 0 && dataFrame[fr][j].active == 1)
+                {
+                    cell.Simplex.Vertices[2].Id = dataFrame[fr][j].ID;
+                }
+
+                vec = new Vector3(f.Vertices[3].X, f.Vertices[3].Y, f.Vertices[3].Z);
+                if ((vec - dataFrame[fr][j].position).sqrMagnitude == 0 && dataFrame[fr][j].active == 1)
+                {
+                    cell.Simplex.Vertices[3].Id = dataFrame[fr][j].ID;
+                }
+            }
+        }
+
+        for (int j = 0; j < nbOfCellsPerFrame[NrFrames - 1]; j++)
+        {
+            foreach (DelaunayCell<Vertex3> cell in delaunay.Cells)
+            {
+                Simplex<Vertex3> f = cell.Simplex;
+                Vector3 vec = new Vector3(f.Vertices[0].X, f.Vertices[0].Y, f.Vertices[0].Z);
+                if (f.Vertices[0].Id == dataFrame[fr][j].ID && dataFrame[fr][j].active == 1)
+                {
+                    dataFrame[fr][j].neighbourhood[f.Vertices[1].Id] = 1;
+                    dataFrame[fr][j].neighbourhood[f.Vertices[2].Id] = 1;
+                    dataFrame[fr][j].neighbourhood[f.Vertices[3].Id] = 1;
+
+                    dataFrame[fr][j].neighbours.AddRange(new int[] { f.Vertices[1].Id, f.Vertices[2].Id, f.Vertices[3].Id });
+                }
+
+                if (f.Vertices[1].Id == dataFrame[fr][j].ID && dataFrame[fr][j].active == 1)
+                {
+                    dataFrame[fr][j].neighbourhood[f.Vertices[0].Id] = 1;
+                    dataFrame[fr][j].neighbourhood[f.Vertices[2].Id] = 1;
+                    dataFrame[fr][j].neighbourhood[f.Vertices[3].Id] = 1;
+
+                    dataFrame[fr][j].neighbours.AddRange(new int[] { f.Vertices[0].Id, f.Vertices[2].Id, f.Vertices[3].Id });
+                }
+
+                if (f.Vertices[2].Id == dataFrame[fr][j].ID && dataFrame[fr][j].active == 1)
+                {
+                    dataFrame[fr][j].neighbourhood[f.Vertices[0].Id] = 1;
+                    dataFrame[fr][j].neighbourhood[f.Vertices[1].Id] = 1;
+                    dataFrame[fr][j].neighbourhood[f.Vertices[3].Id] = 1;
+
+                    dataFrame[fr][j].neighbours.AddRange(new int[] { f.Vertices[0].Id, f.Vertices[1].Id, f.Vertices[3].Id });
+                }
+
+                if (f.Vertices[3].Id == dataFrame[fr][j].ID && dataFrame[fr][j].active == 1)
+                {
+                    dataFrame[fr][j].neighbourhood[f.Vertices[0].Id] = 1;
+                    dataFrame[fr][j].neighbourhood[f.Vertices[1].Id] = 1;
+                    dataFrame[fr][j].neighbourhood[f.Vertices[2].Id] = 1;
+
+                    dataFrame[fr][j].neighbours.AddRange(new int[] { f.Vertices[0].Id, f.Vertices[1].Id, f.Vertices[2].Id });
+                }
+            }
+            dataFrame[fr][j].neighbours = dataFrame[fr][j].neighbours.Distinct().ToList();
+        }
+        //*/
+
+        // Compute Relative Velocities
+        //*
+        for (int i = 0; i < dataFrame[fr].Length; i++)
+        {
+            if (dataFrame[fr][i].active == 1)
+            {
+                Vector3 meanVelocity = new Vector3();
+                for (int j = 0; j < dataFrame[fr][i].neighbours.Count; j++)
+                {
+                    meanVelocity += dataFrame[fr][dataFrame[fr][i].neighbours[j]].velocity;
+                }
+                meanVelocity /= (dataFrame[fr][i].neighbours.Count);
+                
+                dataFrame[fr][i].relativeVelocity = dataFrame[fr][i].velocity - meanVelocity;
+            }
+        }
+        //*/
     }
 
 	public void Log(){
