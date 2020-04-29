@@ -16,4 +16,4 @@ In order to run the examples scenes
 
 ![Alt text](https://github.com/guijoe/MaSoFin/blob/master/images/Proliferation_in_unity.PNG "Proliferation in unity")
 
-This repository is part of our paper submission for ECCB2020 conference. More on this can be found at http://bioemergences.eu/modelingFin
+This repository is part of our paper submission for ECCB2020 conference. More on this can be found at  http://bioemergences.iscpif.fr/modelingFin/
