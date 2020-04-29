@@ -7,7 +7,7 @@ public class SimulationViewer : ViewerController {
     public override void GetData(){
         NrPlots = 13;
 
-        timeSeries = new Simulator(folder, "test_06012020.csv");
+        timeSeries = new Simulator(folder, dataFile, paramsFile);
         timeSeries.ProcessMovitData();
         //timeSeries.Log();
     }

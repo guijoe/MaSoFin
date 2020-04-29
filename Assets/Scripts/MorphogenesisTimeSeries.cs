@@ -10,10 +10,11 @@ using System.Linq;
 
 public class MorphogenesisTimeSeries : DataInterface {
 
-    public MorphogenesisTimeSeries(string folder, String file)
+    public MorphogenesisTimeSeries(string folder, string file, string paramsFile)
     {
         this.folder = folder;
         this.file = file;
+        this.paramsFile = paramsFile;
 
         logFile = folder + "/" + file;
     }

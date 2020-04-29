@@ -7,7 +7,7 @@ public class OrientationViewer : ViewerController {
     public override void GetData(){
         NrPlots = 13;
 
-        timeSeries = new OrientationsTimeSeries(folder, "test_06012020.csv");
+        timeSeries = new OrientationsTimeSeries(folder, dataFile, paramsFile);
         timeSeries.ProcessMovitData();
         //timeSeries.Log();
     }

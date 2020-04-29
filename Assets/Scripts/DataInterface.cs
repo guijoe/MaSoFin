@@ -13,6 +13,8 @@ public abstract class DataInterface {
 	protected string folder = "";
     protected string file = "";
 
+    protected string paramsFile = "";
+
     protected float Xscale = 1;
     protected float Yscale = 1;
     protected float Zscale = 1;
@@ -66,10 +68,11 @@ public abstract class DataInterface {
     {
     }
 
-	public DataInterface(string folder, String file)
+	public DataInterface(string folder, string file, string paramsFile)
     {
         this.folder = folder;
         this.file = file;
+        this.paramsFile = paramsFile;
 
         logFile = folder + "/" + file;
     }
@@ -83,7 +86,7 @@ public abstract class DataInterface {
 
 	public void ReadParameters()
     {
-        string paramsFile = folder + "/180420hZ_21361.xml";
+        string paramsFile = folder + "/" + this.paramsFile;
 
         XmlReader reader = XmlReader.Create(paramsFile);
         while (reader.Read())
@@ -265,7 +268,7 @@ public abstract class DataInterface {
                                 boundsSize[maxFrY].y/resolution, 
                                 boundsSize[maxFrZ].z/resolution);
 
-        Debug.Log("Thau: "+ thau);
+        //Debug.Log("Thau: "+ thau);
 
         frequencies = new int[resolution+1][];
         relativeFrequencies = new int[resolution+1][];

@@ -16,10 +16,11 @@ public class Simulator : DataInterface{
     List<int> nonActiveList;
 	int activeCount;
 
-	public Simulator(string folder, String file)
+	public Simulator(string folder, string file, string paramsFile)
     {
         this.folder = folder;
         this.file = file;
+        this.paramsFile = paramsFile;
 
         logFile = folder + "/" + file;
     }

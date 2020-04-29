@@ -10,10 +10,11 @@ using System.Linq;
 
 public class OrientationsTimeSeries : DataInterface {
 
-    public OrientationsTimeSeries(string folder, String file)
+    public OrientationsTimeSeries(string folder, string file, string paramsFile)
     {
         this.folder = folder;
         this.file = file;
+        this.paramsFile = paramsFile;
 
         logFile = folder + "/" + file;
     }

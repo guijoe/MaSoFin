@@ -7,7 +7,7 @@ public class ProliferationViewer : ViewerController {
     public override void GetData(){
         NrPlots = 12;
 
-        timeSeries = new ProliferationTimeSeries(folder, "test_06012020.csv");
+        timeSeries = new ProliferationTimeSeries(folder, dataFile, paramsFile);
         timeSeries.ProcessMovitData();
         timeSeries.Log();
     }

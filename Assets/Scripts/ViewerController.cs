@@ -26,6 +26,8 @@ public class ViewerController : MonoBehaviour {
     public static Vector3[] NSquaredInN;
 
     public string folder = "C:/Users/18003111/OneDrive - MMU/Documents/movit/application.windows64/MovitData/distant/180420hZ";
+    public string dataFile = "test_06012020.csv";
+    public string paramsFile = "180420hZ_21361.xml";
 
     public virtual void InitPlots(){}
 

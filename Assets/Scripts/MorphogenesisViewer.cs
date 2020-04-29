@@ -7,7 +7,7 @@ public class MorphogenesisViewer : ViewerController{
     public override void GetData(){
         NrPlots = 9;
 
-        timeSeries = new MorphogenesisTimeSeries(folder, "test_06012020.csv");
+        timeSeries = new MorphogenesisTimeSeries(folder, dataFile, paramsFile);
         timeSeries.ProcessMovitData();
         //timeSeries.Log();
     }

@@ -10,10 +10,11 @@ using System.Linq;
 
 public class ProliferationTimeSeries : DataInterface {
 
-    public ProliferationTimeSeries(string folder, String file)
+    public ProliferationTimeSeries(string folder, string file, string paramsFile)
     {
         this.folder = folder;
         this.file = file;
+        this.paramsFile = paramsFile;
 
         logFile = folder + "/" + file;
     }
