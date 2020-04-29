@@ -3,7 +3,7 @@ Code Source used to Analyse, Model and Simulate Zebrafish pectoral fin morphogen
 The Game Engine Unity3D has been used to program and visualise biological data analysis and simulations.
 The code can be found in the "Assets/Scripts" folder.
 
-![Alt text](https://github.com/guijoe/MaSoFin/tree/master/images/Proliferation.GIF "Proliferation Analysis")
+![Alt text](https://github.com/guijoe/MaSoFin/blob/master/images/Proliferation.gif "Proliferation Analysis")
 
 
 In order to run the examples scenes
@@ -14,4 +14,4 @@ In order to run the examples scenes
 4. Click on the unity Play button and wait for the program to load
 5. Click the checkbox "Play" in the editor view
 
-![Alt text](https://github.com/guijoe/MaSoFin/tree/master/images/Proliferation_in_unity.PNG "Proliferation in unity")
+![Alt text](https://github.com/guijoe/MaSoFin/blob/master/images/Proliferation_in_unity.png "Proliferation in unity")
