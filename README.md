@@ -15,3 +15,5 @@ In order to run the examples scenes
 5. Click the checkbox "Play" in the Inspector view
 
 ![Alt text](https://github.com/guijoe/MaSoFin/blob/master/images/Proliferation_in_unity.PNG "Proliferation in unity")
+
+This repository is part of our paper submission. More on this can be found at http://bioemergences.eu/modelingFin
