@@ -34,6 +34,9 @@ public class ProliferationTimeSeries : DataInterface {
         {
             ComputeFinOrientation(fr);
         }
+
+        
+
         //Debug.Log(meanStr);
         
         ComputeBoundingBox();
@@ -158,7 +161,7 @@ public class ProliferationTimeSeries : DataInterface {
                 dataFrame[fr][n].YClassFrequencyVsCumulated = dataFrame[fr][n].YClassFrequency/ frequenciesVsCumulated[(int)dataFrame[fr][n].YClassIndex][1];
                 dataFrame[fr][n].ZClassFrequencyVsCumulated = dataFrame[fr][n].ZClassFrequency/ frequenciesVsCumulated[(int)dataFrame[fr][n].ZClassIndex][2];
 
-                Debug.Log(fr + ", " + dataFrame[fr][n].XClassFrequencyVsCumulated + ", " + dataFrame[fr][n].YClassFrequencyVsCumulated);
+                //Debug.Log(fr + ", " + dataFrame[fr][n].XClassFrequencyVsCumulated + ", " + dataFrame[fr][n].YClassFrequencyVsCumulated);
             }
         }
     }

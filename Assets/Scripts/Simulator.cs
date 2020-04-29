@@ -65,6 +65,7 @@ public class Simulator : DataInterface{
                 dataFrame[fr][n].rotatedPosition = finMatrix.R.Transpose() * (dataFrame[fr][n].position - centre[fr]) + centre[fr];
                 dataFrame[fr][n].principalAxis =  finMatrix.R.Transpose() * dataFrame[fr][n].principalAxis;
             }
+            
             ComputeOrientationDistribution(fr, true);
 		}
 

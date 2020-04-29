@@ -176,11 +176,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c5464828f41d7d142b316ede96ccd952, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  plot4DPrefab: {fileID: 114185832503875806, guid: 40eb2e8064b54694887656ba4e561719,
+  plot4DPrefab: {fileID: 114278790381286448, guid: 40eb2e8064b54694887656ba4e561719,
     type: 2}
   play: 0
   reset: 0
-  enhancePlot: 0
+  enhancePlot: 1
   frame: 0
   folder: C:/Users/18003111/OneDrive - MMU/Documents/movit/application.windows64/MovitData/distant/180420hZ
   resetValues: 

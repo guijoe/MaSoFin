@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/Scenes/OrientationsScene.unity
+- path: Assets/Scenes/ProliferationScene.unity
   isLoaded: 1
   isActive: 1

@@ -5,7 +5,7 @@ using UnityEngine;
 public class ProliferationViewer : ViewerController {
 
     public override void GetData(){
-        NrPlots = 15;
+        NrPlots = 12;
 
         timeSeries = new ProliferationTimeSeries(folder, "test_06012020.csv");
         timeSeries.ProcessMovitData();
@@ -137,6 +137,7 @@ public class ProliferationViewer : ViewerController {
         plots[11].XYZbounds[0][1] = 80; plots[11].XYZbounds[1][1] = 10; plots[11].XYZbounds[2][1] = 80;
         plots[11].userSetBounds = true;
 
+        /*
         // 2nd Plot: Proliferation Distribution X Vs Initial
         plots[12].metricIndices = new int[6] { 19, 56, 24, 13, 14, 50 };
         plots[12].defaultPrefab = false;

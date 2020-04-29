@@ -107,10 +107,6 @@ public abstract class DataInterface {
     protected string logFile;
     public void ReadResults()
     {
-        //string logFile = folder + "/test_06012020.csv"; //"/test.csv";//
-        //string logFile = folder + "/190425aZ_t_all_T.csv";//"/test.csv";
-
-        Debug.Log(logFile);
         string[] results = File.ReadAllLines(logFile);
 
         vertices = new Vertex3[NrFrames][];
@@ -174,7 +170,6 @@ public abstract class DataInterface {
                                                             )
                                             )
                                       );
-                //Debug.Log(allData[index][0]);
             }
         }
 
@@ -246,7 +241,7 @@ public abstract class DataInterface {
             }
             str += boundsSize[fr].ToString("0.000") + "\n";
         }
-        Debug.Log(str);
+        
 
         // Compute thau
         int maxFrX=0, maxFrY=0, maxFrZ=0; 
@@ -270,7 +265,7 @@ public abstract class DataInterface {
                                 boundsSize[maxFrY].y/resolution, 
                                 boundsSize[maxFrZ].z/resolution);
 
-        //Debug.Log("Thau:" + thau);
+        Debug.Log("Thau: "+ thau);
 
         frequencies = new int[resolution+1][];
         relativeFrequencies = new int[resolution+1][];
@@ -401,12 +396,9 @@ public abstract class DataInterface {
             dataFrame[fr][i].globalPrincipalAxis = new Vector3(finMatrix.R[0,0], finMatrix.R[1,0], finMatrix.R[2,0]);
             dataFrame[fr][i].globalSecondaryAxis = new Vector3(finMatrix.R[0,1], finMatrix.R[1,1], finMatrix.R[2,1]);
             dataFrame[fr][i].globalTertiaryAxis = new Vector3(finMatrix.R[0,2], finMatrix.R[1,2], finMatrix.R[2,2]);
-            //Debug.Log(fr + ", " +centre[fr]);
             dataFrame[fr][i].rotatedPosition = finMatrix.R.Transpose() * (dataFrame[fr][i].position - centre[fr]) + centre[fr];
+            //Debug.Log(fr + ", " + i + ", " + dataFrame[fr][i].rotatedPosition);
             dataFrame[fr][i].principalAxis = finMatrix.R.Transpose() * dataFrame[fr][i].principalAxis;
-            //float tmp = dataFrame[fr][i].rotatedPosition.y;
-            //dataFrame[fr][i].rotatedPosition.y = dataFrame[fr][i].rotatedPosition.z;
-            //dataFrame[fr][i].rotatedPosition.z = tmp;
         }
     }
 
@@ -475,7 +467,6 @@ public abstract class DataInterface {
         overallFrequencies[fr] = new int[numberOfClasses];
         for(int i=0; i<numberOfClasses+1; i++)
         {
-            //classes[i] = 180 * i / (numberOfClasses);
             classes[i] = Mathf.PI * i / (numberOfClasses);
         }
 
@@ -542,36 +533,14 @@ public abstract class DataInterface {
 
         meanStr += mean + "\n";
         
-        //standardDeviation /= countActive;
         standardDeviation = Mathf.Sqrt(standardDeviation);
 
         for (int i = 0; i < dataFrame[fr].Length; i++)
         {
             dataFrame[fr][i].elongationAngleMean = mean;
             dataFrame[fr][i].elongationAngleSD = standardDeviation;
-            //dataFrame[fr][i].angle = Mathf.PI * fr/(2*(NrFrames-1));
-            //dataFrame[fr][i].sin = Mathf.Sin(dataFrame[fr][i].angle)/2f;
-            //dataFrame[fr][i].angle = Mathf.Arccos(Vector3.Dot(UnityEngine.Random.onUnitSphere, Vector3.up));
-
-			//*
-            if (dataFrame[fr][i].elongationAngleClass < mean - standardDeviation)
-            {
-                dataFrame[fr][i].cluster = 0;
-            }
-            else if(dataFrame[fr][i].elongationAngleClass > mean + standardDeviation)
-            {
-                dataFrame[fr][i].cluster = 0;
-            }
-            else
-            {
-                dataFrame[fr][i].cluster = 0;
-            }
-            //*/
-
-            //
+            dataFrame[fr][i].cluster = 0;
         }
-
-        //Debug.Log(fr + ", " + mean + ", " + standardDeviation);
 
         //*
         if(fr == NrFrames-2){
@@ -589,7 +558,7 @@ public abstract class DataInterface {
                 }
                 
             }
-            rdmean /= 15;
+            rdmean /= (numberOfClasses/2);
             Debug.Log("Random Distribution: " + sum+", "+rdmean);
 
             for(int i=0; i<randomFrequencies.Length; i++){
@@ -628,7 +597,7 @@ public abstract class DataInterface {
                                 dataFrame[t][i].sin = randomFrequenciesT[t][j];
                                 dataFrame[t][i].line = new Vector3(classes[j + 1] - classes[j], randomFrequenciesT[t][j+1]-randomFrequenciesT[t][j], 0);
                                 
-                                if(j==14) dataFrame[t][i].line = Vector3.zero;
+                                if(j==(numberOfClasses/2)-1) dataFrame[t][i].line = Vector3.zero;
                             
                             }
                             j++;

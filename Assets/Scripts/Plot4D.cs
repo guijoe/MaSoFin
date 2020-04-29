@@ -96,10 +96,8 @@ public class Plot4D : MonoBehaviour {
             //Debug.Log("hello");
         }
 
-        //metrics = GetComponentInParent<ViewerController>().tuples;
-
         ViewerController viewer = GetComponentInParent(typeof(ViewerController)) as ViewerController;
-        Debug.Log(viewer.tuples);
+        //Debug.Log(viewer.tuples);
         metrics = viewer.tuples;
         NrFrames = metrics.Length;
 
@@ -375,6 +373,9 @@ public class Plot4D : MonoBehaviour {
             Transform timeLabel = transform.GetChild(1).GetChild(7);
             float time = 28 + frame * (47.85f - 28)/518;
             timeLabel.GetComponent<TextMesh>().text = time.ToString("0.0") + "hpf";
+            timeLabel.transform.localPosition = new Vector3(10.2f, 
+                                                        timeLabel.transform.localPosition.y,
+                                                        timeLabel.transform.localPosition.z);
 
             for (int n = 0; n < metrics[frame].Length; n++)
             //for (int n = 0; n < cells.Count; n++)
@@ -391,6 +392,8 @@ public class Plot4D : MonoBehaviour {
                 if(defaultPrefab){
                     cells[n].transform.localPosition = new Vector3(metric.x,metric.y,metric.z);
                 }else if(!flipXYAxis){
+                    if(metric.y>XYZbounds[1][1])
+                        metric.y = XYZbounds[1][1];
                     cells[n].transform.localPosition = new Vector3(metric.x,metric.y/2,metric.z);
                     cells[n].transform.localScale = new Vector3(.2f,metric.y,.2f);  
                 }else{
@@ -402,7 +405,7 @@ public class Plot4D : MonoBehaviour {
                 cells[n].active = (int)metrics[frame][n][metricIndices[4]];
                 
                 if(!colorGradient){
-                    //Debug.Log("Selection color: " + (int)metrics[frame][n][metricIndices[3]]);
+                    //Debug.Log(n + ", " + frame + ", " + metricIndices[3] + ", " + metrics[frame][n][metricIndices[3]] + ", Selection color: " + (int)metrics[frame][n][metricIndices[3]]);
                     cells[n].GetComponent<MeshRenderer>().material.color = selectionColors[(int)metrics[frame][n][metricIndices[3]]];
                 }else if(colorGradient && cells[n].active == 1){
                     cells[n].GetComponent<MeshRenderer>().material.color = new Color(1f, metrics[frame][n][metricIndices[5]], 0);
@@ -607,7 +610,8 @@ public class Plot4D : MonoBehaviour {
                     Vector3 orientation2 = new Vector3(m_c[0][0] * metrics[fr][n][complementarySeries[i][6]],
                                                     m_c[1][0] * metrics[fr][n][complementarySeries[i][7]],
                                                     m_c[2][0] * metrics[fr][n][complementarySeries[i][8]]);
-                    if(cells[n].active == 1){
+                    
+                    if(cells[(i+1)*metrics[fr].Length + n].active == 1){
                         Gizmos.DrawLine(transform.position + cells[(i+1)*metrics[fr].Length + n].transform.localPosition,
                                     transform.position + cells[(i+1)*metrics[fr].Length + n].transform.localPosition + orientation2);
                     }

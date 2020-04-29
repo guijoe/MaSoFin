@@ -9,7 +9,7 @@ public class OrientationViewer : ViewerController {
 
         timeSeries = new OrientationsTimeSeries(folder, "test_06012020.csv");
         timeSeries.ProcessMovitData();
-        timeSeries.Log();
+        //timeSeries.Log();
     }
 
     public override void InitPlots(){
