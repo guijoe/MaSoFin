@@ -14,4 +14,4 @@ In order to run the examples scenes
 4. Click on the unity Play button and wait for the program to load
 5. Click the checkbox "Play" in the editor view
 
-![Alt text](https://github.com/guijoe/MaSoFin/blob/master/images/Proliferation_in_unity.png "Proliferation in unity")
+![Alt text](https://github.com/guijoe/MaSoFin/blob/master/images/Proliferation_in_unity.PNG "Proliferation in unity")
