@@ -10,7 +10,7 @@ In order to run the examples scenes
 
 1. Open this project in unity
 2. Select the viewer GameObject beneat the scene, the Inspector view associated to this viewer settings will appear (left in the image below)
-3. Indicate the data folder in the "Folder" input on the Inspector view
+3. Fill the data folder in the "Folder" input on the Inspector view, as well as the data file input (.csv) and the parameters file input (.xml)
 4. Click on the unity Play button and wait for the program to load
 5. Click the checkbox "Play" in the Inspector view
 
